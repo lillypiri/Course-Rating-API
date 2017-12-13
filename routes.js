@@ -38,6 +38,13 @@ router.param('cID', function(req, res, next, id) {
 
 /* USER routes */
 // in postman make content-type application/x-www-form-urlencoded
+
+// GET /api/users 200 - make it return the currently authenticated user
+router.get('/users', mid.requiresLogin, function(req, res, next) {
+  res.status(200);
+  return res.send({ fullName: req.currentUser.fullName });
+});
+
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', function(req, res, next) {
   console.log('body1', req.body);
@@ -52,48 +59,6 @@ router.post('/users', function(req, res, next) {
     res.end();
   });
 });
-
-// GET /api/users 200 - make it return the currently authenticated user
-router.get('/users', mid.requiresLogin, function(req, res, next) {
-  res.status(200);
-  return res.send({ fullName: req.currentUser.fullName });
-});
-
-router.get('/users/all', function(req, res) {
-  User.find({}).exec(function(err, users) {
-    if (err) return next(err);
-    res.json(users);
-  });
-});
-
-// POST /login
-router.post('/login', function(req, res, next) {
-  if (req.body.emailAddress && req.body.password) {
-    User.authenticate(req.body.emailAddress, req.body.password, function(error, user) {
-      if (error || !user) {
-        var err = new Error('Wrong email or password');
-        err.status = 401;
-        return next(err);
-      } else {
-        req.session.userId = user._id;
-        return res.end();  
-      }
-     });
-  } else {
-    console.log("body login", req.body.emailAddress, req.body.password)
-    var err = new Error('Email and password are required');
-    err.status = 401;
-    return next(err);
-  }
-});
-
-
-// route for a specific user - need to make this authenticated user
-router.get('/users/:uID', (req, res, next) => {
-  res.json(req.user);
-});
-
-
 
 /* COURSE routes */
 // GET /api/courses 200 - Returns the Course "_id" and "title" properties
@@ -133,7 +98,6 @@ router.post('/courses', mid.requiresLogin, function(req, res, next) {
   });
 });
 
-// CHECK THIS IS OK
 // PUT /api/courses/:courseId 204 - Updates a course and returns no content
 router.put('/courses/:cID', mid.requiresLogin, function(req, res, next) {
   console.log('update course', req.body);
