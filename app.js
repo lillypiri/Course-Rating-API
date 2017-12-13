@@ -1,11 +1,10 @@
-'use strict';
-
 const express = require('express');
 const app = express();
 const routes = require('./routes');
 
 const jsonParser = require('body-parser').json;
 const bodyParser = require('body-parser')
+
 const logger = require('morgan');
 
 const mongoose = require('mongoose');
@@ -17,6 +16,8 @@ const users = require('./routes');
 const courses = require('./routes');
 const reviews = require('./routes');
 
+const mid = require('./middleware');
+
 app.use(logger('dev'));
 app.use(jsonParser());
 
@@ -25,6 +26,7 @@ app.use(
     extended: true
   })
 );
+
 
 // connect to the Mongo DB server.
 mongoose.connect('mongodb://localhost:27017/rest');
@@ -64,7 +66,6 @@ app.use(session({
     mongooseConnection: db
   })
 }));
-
 
 app.use('/api', routes);
 

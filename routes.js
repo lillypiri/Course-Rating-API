@@ -1,5 +1,3 @@
-'use strict';
-
 const express = require('express');
 const router = express.Router();
 
@@ -56,18 +54,9 @@ router.post('/users', function(req, res, next) {
 });
 
 // GET /api/users 200 - make it return the currently authenticated user
-router.get('/users', function(req, res, next) {
-  User.findById(req.session.userId).exec(function(error, user) {
-    if (error) {
-      return next(error);
-    }  else if (user === null) {
-      return res.send('You need to be logged in to view this page.');
-    } else {
-      res.status(200);
-      console.log('maybe logged in?', user);
-      return res.send({ fullName: user.fullName });
-    }
-  });
+router.get('/users', mid.requiresLogin, function(req, res, next) {
+  res.status(200);
+  return res.send({ fullName: req.currentUser.fullName });
 });
 
 router.get('/users/all', function(req, res) {
@@ -141,7 +130,6 @@ router.post('/courses', mid.requiresLogin, function(req, res, next) {
     res.status(201);
     res.location('/');
     res.end();
-    // res.json(course);
   });
 });
 
