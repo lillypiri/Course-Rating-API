@@ -2,15 +2,13 @@
 
 const express = require('express');
 const router = express.Router();
+
 const User = require('./models').User;
 const Course = require('./models').Course;
 const Review = require('./models').Review;
 const mid = require('./middleware');
 
-
-
 // Incoming requests to the database handled here in route handlers - use Mongoose to persist/retrieve the data.
-
 
 // get user id
 router.param('uID', function(req, res, next, id) {
@@ -50,10 +48,10 @@ router.post('/users', function(req, res, next) {
     if (err) {
       return next(err);
     }
+    req.session.userId = user._id;
     res.status(201);
     res.location('/');
     res.end();
-    //res.json(user);
   });
 });
 
@@ -159,8 +157,7 @@ router.put('/courses/:cID', function(req, res, next) {
 });
 
 // POST /api/courses/:courseId/reviews 201 - 
-// Creates a review for the specified course ID, sets the Location header to the related course, 
-// and returns no content
+// Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
 router.post('/courses/:cID/reviews', mid.requiresLogin, function(req, res, next) {
   console.log('creating a review', req.body);
   let review = new Review(req.body);
