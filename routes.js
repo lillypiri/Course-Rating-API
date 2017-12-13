@@ -56,7 +56,7 @@ router.post('/users', function(req, res, next) {
 });
 
 // GET /api/users 200 - make it return the currently authenticated user
-router.get('/users', mid.requiresLogin, function(req, res, next) {
+router.get('/users', function(req, res, next) {
   User.findById(req.session.userId).exec(function(error, user) {
     if (error) {
       return next(error);
@@ -108,7 +108,7 @@ router.get('/users/:uID', (req, res, next) => {
 
 /* COURSE routes */
 // GET /api/courses 200 - Returns the Course "_id" and "title" properties
-router.get('/courses', mid.requiresLogin, function(req, res, next) {
+router.get('/courses', function(req, res, next) {
   Course.find({}).exec(function(err, courses) {
     if (err) return next(err);
     // res.json ends the req/res cycle, so loop over the courses and store it in an array. Then pass to the response object outside of the loop
@@ -126,12 +126,12 @@ router.get('/courses', mid.requiresLogin, function(req, res, next) {
 });
 
 // GET /api/courses/:courseId 200 - Returns all Course properties and related user and review documents for the provided course ID
-router.get('/courses/:cID', mid.requiresLogin, (req, res, next) => {
+router.get('/courses/:cID', (req, res, next) => {
   res.json(req.course);
 });
 
 // POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
-router.post('/courses', function(req, res, next) {
+router.post('/courses', mid.requiresLogin, function(req, res, next) {
   console.log('course body', req.body);
   let course = new Course(req.body);
   course.save(function(err, course) {
@@ -147,13 +147,13 @@ router.post('/courses', function(req, res, next) {
 
 // CHECK THIS IS OK
 // PUT /api/courses/:courseId 204 - Updates a course and returns no content
-router.put('/courses/:cID', function(req, res, next) {
+router.put('/courses/:cID', mid.requiresLogin, function(req, res, next) {
   console.log('update course', req.body);
   req.course.update(req.body, function(err, result) {
-    if(err) return next(err);
+    if (err) return next(err);
     res.status(204);
     res.end();
-  })
+  });
 });
 
 // POST /api/courses/:courseId/reviews 201 - 
