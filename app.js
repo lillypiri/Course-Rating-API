@@ -16,6 +16,7 @@ const users = require('./routes');
 const courses = require('./routes');
 const reviews = require('./routes');
 
+const config = require('./config');
 const mid = require('./middleware');
 
 app.use(logger('dev'));
@@ -57,9 +58,13 @@ db.once('open', function() {
   }
 });
 
+console.log("config", config); //=> config { secret: 'who killed bambis mum' }
+// however errors as => "Secret string must be provided."
+
+// do i need to use this?
 // express session
 app.use(session({
-  secret: 'its free real estate',
+  secret: config.secret,
   resave: true,
   saveUninitialized: false,
   store: new MongoStore({
