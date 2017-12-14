@@ -81,7 +81,23 @@ router.get('/courses', function(req, res, next) {
 
 // GET /api/courses/:courseId 200 - Returns all Course properties and related user and review documents for the provided course ID
 router.get('/courses/:cID', (req, res, next) => {
-  res.json(req.course);
+  Course.find({}).populate('user', 'fullName').populate({ path: 'reviews', populate: { path: 'user', select: 'fullName' }}).exec(function(err, course) {
+    if (err) return next(err);
+    let singleCourse = [];
+    course.forEach((item) => {
+      let itemObject = item.toObject();
+      singleCourse.push({
+        user: item.user,
+        fullName: item.fullName,
+        title: item.title,
+        description: item.description,
+        estimatedTime: item.estimatedTime,
+        reviews: item.reviews,
+        steps: item.steps
+      });
+    })
+      res.json(singleCourse);
+  });
 });
 
 // POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
