@@ -96,7 +96,6 @@ UserSchema.pre('save', function(next) {
 
 // check the login details
 UserSchema.statics.authenticate = function(emailAddress, password, callback) {
-  console.log('inside user schema');
   User.findOne({ emailAddress: emailAddress }).exec(function(error, user) {
     if (error) {
       return callback(error);
@@ -106,9 +105,7 @@ UserSchema.statics.authenticate = function(emailAddress, password, callback) {
       return callback(err);
     }
     bcrypt.compare(password, user.password, function(error, result) {
-      console.log('comparing');
       if (result === true) {
-        console.log('tru');
         return callback(null, user);
       } else {
         return callback();

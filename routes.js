@@ -47,7 +47,6 @@ router.get('/users', mid.requiresLogin, function(req, res, next) {
 
 // POST /api/users 201 - Creates a user, sets the Location header to "/", and returns no content
 router.post('/users', function(req, res, next) {
-  console.log('body1', req.body);
   let user = new User(req.body);
   user.save(function(err, user) {
     if (err) {
@@ -90,7 +89,6 @@ router.get('/courses/:cID', (req, res, next) => {
 
 // POST /api/courses 201 - Creates a course, sets the Location header, and returns no content
 router.post('/courses', mid.requiresLogin, function(req, res, next) {
-  console.log('course body', req.body);
   let course = new Course(req.body);
   course.save(function(err, course) {
     if (err) {
@@ -104,7 +102,6 @@ router.post('/courses', mid.requiresLogin, function(req, res, next) {
 
 // PUT /api/courses/:courseId 204 - Updates a course and returns no content
 router.put('/courses/:cID', mid.requiresLogin, function(req, res, next) {
-  console.log('update course', req.body);
   req.course.update(req.body, function(err, result) {
     if (err) return next(err);
     res.status(204);
@@ -115,16 +112,25 @@ router.put('/courses/:cID', mid.requiresLogin, function(req, res, next) {
 // POST /api/courses/:courseId/reviews 201 - 
 // Creates a review for the specified course ID, sets the Location header to the related course, and returns no content
 router.post('/courses/:cID/reviews', mid.requiresLogin, function(req, res, next) {
-  console.log('creating a review', req.body);
-  let review = new Review(req.body);
-  review.save(function(err, course) {
+  // Only create a review if the course is not created by the current user
+  console.log('req.course.user.toString() is ', req.course.user.toString(), 'and is a type of', typeof req.course.user, ' and req.currentUser.id is ', req.currentUser.id, 'and is typeof ', typeof req.currentUser.id);
+  if (req.course.user.toString() === req.currentUser.id) {
+    const err = new Error("You can't review your own course ya dingus");
+    err.status = 400; // Bad request status code
+    return next(err);
+  }
+
+  new Review(req.body).save(function(err, review) {
+    console.log("creating a review")
     if (err) {
       return next(err);
     }
+
     res.status(201);
-    res.location('/')
+    res.location('/');
     res.json();
-  })
+  });
 });
+
 
 module.exports = router;
