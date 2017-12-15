@@ -82,10 +82,6 @@ const ReviewSchema = new Schema({
   review: String
 })
 
-const userData = [
-  { fullName: "Coco Kitty", emailAddress: "coco@coco.com", password: "password" }, 
-]
-
 // encrypt the password before saving it to the db
 UserSchema.pre('save', function(next) {
   var user = this;
@@ -126,11 +122,6 @@ const User = mongoose.model('User', UserSchema);
 const Review = mongoose.model('Review', ReviewSchema);
 const Course = mongoose.model('Course', CourseSchema);
 
-const user = new User(userData);
-
-User.create(userData, function(err, users) {
-  if (err) console.error(err);
-});
 
 
 module.exports.Review = Review;
