@@ -3,11 +3,10 @@ var request = require('supertest');
 var chai = require('chai').expect;
 const User = require('../models').User;
 
-/* to run the tests type mocha tests/spec.js */
+/* to run the tests type mocha tests/spec.js --exit */
 
 describe('user', function() {
-
-// When I make a request to the GET /api/users route with the correct credentials, the corresponding user document is returned
+  // When I make a request to the GET /api/users route with the correct credentials, the corresponding user document is returned
   it('should return a user', function(done) {
     const userData = [{ fullName: 'John Smith', emailAddress: 'john@smith.com', password: 'password' }];
     User.create(userData, function(err, users) {
@@ -19,6 +18,7 @@ describe('user', function() {
        .expect(200)
        .end(function(err, resp) {
          if (err) return done(err);
+         chai(resp.body.fullName).to.eq('Joe Smith');
          done();
        });
       });

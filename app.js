@@ -29,12 +29,12 @@ app.use(
 
 
 // connect to the Mongo DB server.
-mongoose.connect('mongodb://localhost:27017/rest');
+mongoose.connect('mongodb://localhost:27017/rest', { useMongoClient: true });
 const db = mongoose.connection;
 
 // tell us if there is a connection error
 db.on('error', function(err) {
-  console.error('connection error:', err);
+  console.error('connection error:', err.message);
 });
 
 // once only fires handler the first time an event occurs.
@@ -47,12 +47,11 @@ db.once('open', function() {
       .seed(data, {dropDatabase: true})
       .then(function(dbData) {
         // The database objects are stored in dbData
-        console.log('in seeder function');
         // console.log(dbData);
       })
       .catch(function(err) {
         // handle error
-        console.log(err, 'seeder error');
+        console.log(err);
       });
   }
 });

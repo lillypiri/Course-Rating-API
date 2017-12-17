@@ -120,15 +120,20 @@ router.post('/courses/:cID/reviews', mid.requiresLogin, function(req, res, next)
     return next(err);
   }
 
-  new Review(req.body).save(function(err, review) {
-    console.log("creating a review")
+  const review = req.body;
+  review.user = req.currentUser;
+
+  new Review(review).save(function(err, review) {
     if (err) {
       return next(err);
     }
 
-    res.status(201);
-    res.location('/');
-    res.json();
+    req.course.reviews.push(review);
+    req.course.save(function(err, course) {
+      res.status(201);
+      res.location('/');
+      res.json();
+    });
   });
 });
 
